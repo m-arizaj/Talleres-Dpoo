@@ -9,6 +9,8 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Scanner;
+import java.io.FileInputStream;
 
 import modelo.Pedido;
 import modelo.Combo;
@@ -36,7 +38,7 @@ public class restaurante
 		
 	}
 	
-	
+		
 	
 	public ArrayList<Pedido> getPedidos()
 	{
@@ -120,6 +122,12 @@ public class restaurante
 		this.pedidosPorId = pedidosPorId;
 	}
 
+	@Override
+	public String toString() 
+	{
+		return "Numero pedidos=" + pedidos + ", combos=" + combos + ", Pedido en proceso=" + pedidoEnProceso
+				+ ", ingredientes=" + ingredientes + ", menuBase=" + menuBase;
+	}
 
 
 	public void CargarArchivosRest() throws FileNotFoundException
@@ -213,11 +221,137 @@ public class restaurante
 		}
 	}
 	
-	@Override
-	public String toString() {
-		return "Numero pedidos=" + pedidos + ", combos=" + combos + ", Pedido en proceso=" + pedidoEnProceso
-				+ ", ingredientes=" + ingredientes + ", menuBase=" + menuBase;
+	
+	
+	public HashMap<String, Integer> AgregarProductoAlPedido(int codigo_pr)
+	{
+		HashMap<String, Integer> mapa = new HashMap<>();
+		
+		if (codigo_pr >= 0 | codigo_pr <= 21) 
+		{
+			
+			ProductoMenu producto = getMenuBase().get(codigo_pr);
+			int precioBase = producto.getPrecioBase();
+			String nombre = producto.getNombre();
+			mapa.put(nombre, precioBase);
+			
+		}
+		
+		return mapa;
+		
 	}
+	
+	
+	public HashMap<String, Integer> AgregarIngredienteAlPedido (int codigo_in) 
+	{
+		
+		HashMap<String, Integer> mapa = new HashMap<>();
+		
+		if (codigo_in >= 0 | codigo_in <= 14) 
+		{
+			Ingrediente ingrediente = getIngredientes().get(codigo_in);
+			int precio = ingrediente.getCostoAdicional();
+			String nombre = ingrediente.getNombre();
+			mapa.put(nombre, precio);
+			
+		}
+		return mapa;
+	
+	
+	
+	}
+	
+	public HashMap<String, Integer> AgregarComboPedido (int codigo_com) 
+	{
+		
+		HashMap<String, Integer> mapa = new HashMap<>();
+		
+		if (codigo_com == 0) {
+			Combo cmb = getCombos().get(0);
+			double preciocombo = 24500 - (24500*0.10);
+			String nombrecombo = cmb.getNombreCombo();
+			mapa.put(nombrecombo, (int) preciocombo);
+		}
+		
+		if (codigo_com == 1) {
+			Combo cmb = getCombos().get(1);
+			double preciocombo = 26500 - (26500*0.10);
+			String nombrecombo = cmb.getNombreCombo();
+			mapa.put(nombrecombo, (int) preciocombo);
+		}
+		
+		if (codigo_com == 2) {
+			Combo cmb = getCombos().get(2);
+			double preciocombo = 36900 - (36900*0.07);
+			String nombrecombo = cmb.getNombreCombo();
+			mapa.put(nombrecombo,(int) preciocombo);
+		}
+		
+		if (codigo_com == 3) {
+			Combo cmb = getCombos().get(3);
+			double preciocombo = 34500 - (34500*0.07);
+			String nombrecombo = cmb.getNombreCombo();
+			mapa.put(nombrecombo,(int) preciocombo);
+		}
+		
+		
+		return mapa;
+	}
+	
+	
+	public void GuardarFacturaPedido (String factura, String nombre) 
+	{
+		try {
+            
+			String path = "data/" + nombre + ".txt";
+			File file = new File(path);
+			
+			if (!file.exists()) 
+			{
+				file.createNewFile();
+			}
+            FileWriter fileWriter = new FileWriter(file);
+            BufferedWriter bufferedWriter = new BufferedWriter(fileWriter);
+            bufferedWriter.write(factura);
+            bufferedWriter.close();
+            System.out.println("El archivo " + nombre + " se ha creado con éxito.");
+
+        } 
+		catch (IOException e) 
+		{
+            e.printStackTrace();
+        }
+		
+    }
+	
+	public String obtenerFactura(int id) 
+	{
+	    String IdPedido = Integer.toString(id);
+	    File archivo = new File("data/" + IdPedido + ".txt");
+
+	    if (!archivo.exists()) {
+	        System.out.println("El archivo " + archivo.getName() + " no existe.");
+	        return null;
+	    }
+
+	    try (FileInputStream inputStream = new FileInputStream(archivo);
+	         Scanner scanner = new Scanner(inputStream)) 
+	    {
+
+	        System.out.println("Contenido de " + archivo.getName() + ":");
+
+	        while (scanner.hasNextLine()) {
+	            String linea = scanner.nextLine();
+	            System.out.println(linea); 
+	        }
+
+	    } catch (IOException e) {
+	        e.printStackTrace();
+	    }
+	    return IdPedido;
+	}
+	
+	
 	
 	
 	
